@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package chat;
+option java_package = "com.example.chat.proto";
+option java_multiple_files = true;
+
+import "google/protobuf/timestamp.proto";
+
+
+
+service ChatService {
+
+  // Send message (Client → Server → DB)
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+
+  // Get old messages from PostgreSQL
+  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
+
+  // Join room (bi-directional streaming)
+  rpc ChatStream(stream ChatEvent) returns (stream ChatEvent);
+
+  //Join and  Leave room
+  rpc JoinRoom(RoomRequest) returns (Empty);
+  rpc LeaveRoom(RoomRequest) returns (Empty);
+}
+
+
+enum MessageStatus {
+  UNKNOWN = 0;
+  SENT = 1;
+  DELIVERED = 2;
+  READ = 3;
+}
+
+// =======================
+// MESSAGES (DB + API)
+// =======================
+
+message User {
+  string user_id = 1;
+  string username = 2;
+}
+
+message ChatMessage {
+  string message_id = 1;
+  string room_id = 2;
+
+  string sender_id = 3;
+  string content = 4;
+
+  google.protobuf.Timestamp timestamp = 5;
+  MessageStatus status = 6;
+}
+
+message SendMessageRequest {
+  string room_id = 1;
+  string sender_id = 2;
+  string content = 3;
+}
+
+message SendMessageResponse {
+  ChatMessage message = 1;
+}
+
+message GetMessagesRequest {
+  string room_id = 1;
+
+  int32 page_size = 2;
+  string last_message_id = 3; // pagination cursor
+}
+
+message GetMessagesResponse {
+  repeated ChatMessage messages = 1;
+}
+
+message RoomRequest {
+  string user_id = 1;
+  string room_id = 2;
+}
+
+
+message AckRequest {
+  string message_id = 1;
+  string user_id = 2;
+  MessageStatus status = 3;
+}
+
+// =======================
+// REAL-TIME STREAM EVENT
+// =======================
+
+message ChatEvent {
+  oneof event {
+    ChatMessage new_message = 1;
+    AckRequest ack = 2;
+  }
+}
+
+message  Empty{
+
+}
+
+
