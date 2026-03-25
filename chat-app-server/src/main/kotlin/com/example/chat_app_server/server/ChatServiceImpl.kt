@@ -105,10 +105,20 @@ class ChatServiceImpl(
                     userId = msg.senderId
                     roomId = msg.roomId
 
+                   
+                    val entity = MessageEntity(
+                        messageId = UUID.randomUUID(),
+                        roomId = msg.roomId,
+                        senderId = msg.senderId,
+                        content = msg.content,
+                        timestamp = Instant.now()
+                    )
+                    repository.save(entity)
 
+             
                     RoomManager.join(roomId, userId, channel)
 
-
+                    // Broadcast the message to everyone in the room
                     runBlocking {
                         RoomManager.broadcast(roomId, event)
                     }
