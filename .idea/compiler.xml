@@ -2,6 +2,9 @@
 <project version="4">
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="chat-app-client" options="-parameters" />
+      <module name="chat-app-client.main" options="-parameters" />
+      <module name="chat-app-client.test" options="-parameters" />
       <module name="chat-app-server" options="-parameters" />
       <module name="chat-app-server.main" options="-parameters" />
       <module name="chat-app-server.test" options="-parameters" />
