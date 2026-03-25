@@ -3,21 +3,24 @@ package com.example.chat_app_server.server
 import com.example.chat.proto.*
 import com.example.chat_app_server.entity.MessageEntity
 import com.example.chat_app_server.repository.MessageRepository
+import com.google.protobuf.Empty
 import io.grpc.stub.StreamObserver
-
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.runBlocking
 import net.devh.boot.grpc.server.service.GrpcService
 import java.time.Instant
 import java.util.UUID
-
-
 
 @GrpcService
 class ChatServiceImpl(
     private val repository: MessageRepository
 ) : ChatServiceGrpc.ChatServiceImplBase() {
 
-    override fun sendMessage(request: SendMessageRequest, responseObserver: StreamObserver<SendMessageResponse>) {
-        super.sendMessage(request, responseObserver)
+
+    override fun sendMessage(
+        request: SendMessageRequest,
+        responseObserver: StreamObserver<SendMessageResponse>
+    ) {
 
         val entity = MessageEntity(
             messageId = UUID.randomUUID(),
@@ -44,10 +47,13 @@ class ChatServiceImpl(
         responseObserver.onCompleted()
     }
 
-    override fun getMessages(request: GetMessagesRequest, responseObserver: StreamObserver<GetMessagesResponse>) {
-        super.getMessages(request, responseObserver)
 
-        val messages =repository.findByRoomId(request.roomId)
+    override fun getMessages(
+        request: GetMessagesRequest,
+        responseObserver: StreamObserver<GetMessagesResponse>
+    ) {
+
+        val messages = repository.findByRoomId(request.roomId)
 
         val protoList = messages.map {
             ChatMessage.newBuilder()
@@ -58,24 +64,93 @@ class ChatServiceImpl(
                 .build()
         }
 
-        responseObserver.onNext(GetMessagesResponse.
-                        newBuilder().
-                        addAllMessages(protoList).
-                        build())
+        val response = GetMessagesResponse.newBuilder()
+            .addAllMessages(protoList)
+            .build()
+
+        responseObserver.onNext(response)
         responseObserver.onCompleted()
-
     }
 
-    override fun chatStream(responseObserver: StreamObserver<ChatEvent>): StreamObserver<ChatEvent> {
-        return super.chatStream(responseObserver)
-    }
-    override fun joinRoom(request: RoomRequest?, responseObserver: StreamObserver<Empty?>?) {
-        super.joinRoom(request, responseObserver)
+
+    override fun chatStream(
+        responseObserver: StreamObserver<ChatEvent>
+    ): StreamObserver<ChatEvent> {
+
+        val channel = Channel<ChatEvent>()
+        var userId = ""
+        var roomId = ""
+
+
+        val senderThread = Thread {
+            try {
+                kotlinx.coroutines.runBlocking {
+                    while (true) {
+                        val event = channel.receive()
+                        responseObserver.onNext(event)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        senderThread.start()
+
+        return object : StreamObserver<ChatEvent> {
+
+            override fun onNext(event: ChatEvent) {
+
+                if (event.hasNewMessage()) {
+                    val msg = event.newMessage
+                    userId = msg.senderId
+                    roomId = msg.roomId
+
+
+                    RoomManager.join(roomId, userId, channel)
+
+
+                    runBlocking {
+                        RoomManager.broadcast(roomId, event)
+                    }
+                }
+            }
+
+            override fun onError(t: Throwable) {
+                RoomManager.leave(roomId, userId)
+                channel.close()
+                responseObserver.onError(t)
+            }
+
+            override fun onCompleted() {
+                RoomManager.leave(roomId, userId)
+                channel.close()
+                responseObserver.onCompleted()
+            }
+        }
     }
 
-    override fun leaveRoom(request: RoomRequest?, responseObserver: StreamObserver<Empty?>?) {
-        super.leaveRoom(request, responseObserver)
+
+    override fun joinRoom(
+        request: RoomRequest,
+        responseObserver: StreamObserver<Empty>
+    ) {
+        println("User ${request.userId} joined room ${request.roomId}")
+
+        responseObserver.onNext(Empty.getDefaultInstance())
+        responseObserver.onCompleted()
     }
 
+
+
+    override fun leaveRoom(
+        request: RoomRequest,
+        responseObserver: StreamObserver<Empty>
+    ) {
+        RoomManager.leave(request.roomId, request.userId)
+        println("User ${request.userId} left room ${request.roomId}")
+
+        responseObserver.onNext(Empty.getDefaultInstance())
+        responseObserver.onCompleted()
+    }
 
 }
