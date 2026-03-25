@@ -30,7 +30,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 
 	implementation("net.devh:grpc-server-spring-boot-starter:2.15.0.RELEASE")
-
+	runtimeOnly("com.h2database:h2")
 	implementation("io.grpc:grpc-kotlin-stub:1.4.1")
 	implementation("io.grpc:grpc-stub:1.60.0")
 	implementation("io.grpc:grpc-protobuf:1.60.0")
@@ -46,6 +46,7 @@ dependencies {
 	runtimeOnly("org.postgresql:postgresql")
 
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+	runtimeOnly("com.h2database:h2")
 }
 
 dependencyManagement {
