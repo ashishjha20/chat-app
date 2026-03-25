@@ -5,7 +5,7 @@ import com.example.chat_app_server.entity.MessageEntity
 import com.example.chat_app_server.repository.MessageRepository
 import io.grpc.stub.StreamObserver
 
-import org.springframework.grpc.server.service.GrpcService;
+import net.devh.boot.grpc.server.service.GrpcService
 import java.time.Instant
 import java.util.UUID
 

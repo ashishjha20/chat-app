@@ -36,10 +36,13 @@ dependencies {
 	implementation("io.grpc:grpc-protobuf:1.60.0")
 
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.7.3")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("net.devh:grpc-server-spring-boot-starter:2.15.0.RELEASE")
 
+	implementation("org.postgresql:postgresql")
 	runtimeOnly("org.postgresql:postgresql")
 
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
