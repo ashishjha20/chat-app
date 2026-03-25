@@ -5,19 +5,33 @@ import kotlinx.coroutines.channels.Channel
 
 object RoomManager {
 
-    private val rooms = mutableMapOf<String, MutableList<Channel<ChatEvent>>>()
+    //map [room] has [user] which has list of chatEvent
+    private val rooms = mutableMapOf<String, MutableMap<String, Channel<ChatEvent>>>()
 
-    fun join(roomId: String, channel: Channel<ChatEvent>) {
-        rooms.computeIfAbsent(roomId) { mutableListOf() }.add(channel)
+    // user joins room
+    fun join(roomId: String, userId: String, channel: Channel<ChatEvent>) {
+        val room = rooms.computeIfAbsent(roomId) { mutableMapOf() }
+        room[userId] = channel
     }
 
-    fun leave(roomId: String, channel: Channel<ChatEvent>) {
-        rooms[roomId]?.remove(channel)
-    }
+    // User leaves room
+    fun leave(roomId: String, userId: String) {
+        rooms[roomId]?.remove(userId)
 
-    suspend fun broadcast(roomId: String, event: ChatEvent) {
-        rooms[roomId]?.forEach {
-            it.send(event)
+        if (rooms[roomId]?.isEmpty() == true) {
+            rooms.remove(roomId)
         }
+    }
+
+    // broadcast to all users in room
+    suspend fun broadcast(roomId: String, event: ChatEvent) {
+        rooms[roomId]?.values?.forEach { channel ->
+            channel.send(event)
+        }
+    }
+
+    // send to specific user
+    suspend fun sendToUser(roomId: String, userId: String, event: ChatEvent) {
+        rooms[roomId]?.get(userId)?.send(event)
     }
 }
