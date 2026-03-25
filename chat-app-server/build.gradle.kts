@@ -25,15 +25,24 @@ repositories {
 extra["springGrpcVersion"] = "1.0.2"
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("io.grpc:grpc-services")
+
+	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+
+	implementation("net.devh:grpc-server-spring-boot-starter:2.15.0.RELEASE")
+
+	implementation("io.grpc:grpc-kotlin-stub:1.4.1")
+	implementation("io.grpc:grpc-stub:1.60.0")
+	implementation("io.grpc:grpc-protobuf:1.60.0")
+
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("org.springframework.grpc:spring-grpc-server-spring-boot-starter")
+
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.7.3")
+
 	runtimeOnly("org.postgresql:postgresql")
-	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testImplementation("org.springframework.grpc:spring-grpc-test")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 dependencyManagement {
@@ -50,19 +59,21 @@ kotlin {
 
 protobuf {
 	protoc {
-		artifact = "com.google.protobuf:protoc"
+		artifact = "com.google.protobuf:protoc:3.25.0"
 	}
 	plugins {
 		id("grpc") {
-			artifact = "io.grpc:protoc-gen-grpc-java"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.60.0"
+		}
+		id("grpckt") {
+			artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.1:jdk8@jar"
 		}
 	}
 	generateProtoTasks {
-		all().forEach {
-			it.plugins {
-				id("grpc") {
-					option("@generated=omit")
-				}
+		all().forEach { task ->
+			task.plugins {
+				id("grpc")
+				id("grpckt")
 			}
 		}
 	}
