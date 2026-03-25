@@ -17,11 +17,53 @@ class ChatServiceImpl(
 ) : ChatServiceGrpc.ChatServiceImplBase() {
 
     override fun sendMessage(request: SendMessageRequest, responseObserver: StreamObserver<SendMessageResponse>) {
+        super.sendMessage(request, responseObserver)
 
+        val entity = MessageEntity(
+            messageId = UUID.randomUUID(),
+            roomId = request.roomId,
+            senderId = request.senderId,
+            content = request.content,
+            timestamp = Instant.now()
+        )
+
+        repository.save(entity)
+
+        val msg = ChatMessage.newBuilder()
+            .setMessageId(entity.messageId.toString())
+            .setRoomId(entity.roomId)
+            .setSenderId(entity.senderId)
+            .setContent(entity.content)
+            .build()
+
+        val response = SendMessageResponse.newBuilder()
+            .setMessage(msg)
+            .build()
+
+        responseObserver.onNext(response)
+        responseObserver.onCompleted()
     }
 
     override fun getMessages(request: GetMessagesRequest, responseObserver: StreamObserver<GetMessagesResponse>) {
         super.getMessages(request, responseObserver)
+
+        val messages =repository.findByRoomId(request.roomId)
+
+        val protoList = messages.map {
+            ChatMessage.newBuilder()
+                .setMessageId(it.messageId.toString())
+                .setRoomId(it.roomId)
+                .setSenderId(it.senderId)
+                .setContent(it.content)
+                .build()
+        }
+
+        responseObserver.onNext(GetMessagesResponse.
+                        newBuilder().
+                        addAllMessages(protoList).
+                        build())
+        responseObserver.onCompleted()
+
     }
 
     override fun chatStream(responseObserver: StreamObserver<ChatEvent>): StreamObserver<ChatEvent> {
