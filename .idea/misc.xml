@@ -3,5 +3,6 @@
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/chat-app-server" />
+    <file type="web" url="file://$PROJECT_DIR$/chat_app_client" />
   </component>
 </project>

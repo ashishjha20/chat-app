@@ -21,22 +21,23 @@ repositories {
 	mavenCentral()
 }
 
-extra["springGrpcVersion"] = "1.0.2"
-
-dependencies {
-	implementation("io.grpc:grpc-services")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("org.springframework.grpc:spring-grpc-client-spring-boot-starter")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testImplementation("org.springframework.grpc:spring-grpc-test")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
 dependencyManagement {
 	imports {
-		mavenBom("org.springframework.grpc:spring-grpc-dependencies:${property("springGrpcVersion")}")
+		mavenBom("io.grpc:grpc-bom:1.60.0")
 	}
+}
+
+dependencies {
+	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("net.devh:grpc-client-spring-boot-starter:2.15.0.RELEASE")
+	implementation("io.grpc:grpc-stub:1.60.0")
+	implementation("io.grpc:grpc-protobuf:1.60.0")
+	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+	implementation("javax.annotation:javax.annotation-api:1.3.2")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 kotlin {
@@ -47,11 +48,11 @@ kotlin {
 
 protobuf {
 	protoc {
-		artifact = "com.google.protobuf:protoc"
+		artifact = "com.google.protobuf:protoc:3.25.3"
 	}
 	plugins {
 		id("grpc") {
-			artifact = "io.grpc:protoc-gen-grpc-java"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.60.0"
 		}
 	}
 	generateProtoTasks {
@@ -67,4 +68,8 @@ protobuf {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
+    standardInput = System.`in`
 }

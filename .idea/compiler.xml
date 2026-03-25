@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="chat-app-client" target="17" />
+      <module name="chat-app-client.main" target="17" />
+      <module name="chat-app-client.test" target="17" />
+    </bytecodeTargetLevel>
+  </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="chat-app-client" options="-parameters" />
@@ -8,6 +15,9 @@
       <module name="chat-app-server" options="-parameters" />
       <module name="chat-app-server.main" options="-parameters" />
       <module name="chat-app-server.test" options="-parameters" />
+      <module name="chat_app_client" options="-parameters" />
+      <module name="chat_app_client.main" options="-parameters" />
+      <module name="chat_app_client.test" options="-parameters" />
     </option>
   </component>
 </project>

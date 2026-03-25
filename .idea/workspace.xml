@@ -5,21 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="03e25f03-3ca0-41bf-8c31-f932d011c6e5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/chat_app_client/src/main/kotlin/com/example/chat_app_client/service/ChatClientImpl.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_app_client/src/main/proto/chat.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chat_app_client/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/build.gradle.kts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/gradlew" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/gradlew.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/settings.gradle.kts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/src/main/kotlin/com/example/chat_app_client/ChatAppClientApplication.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-client/src/test/kotlin/com/example/chat_app_client/ChatAppClientApplicationTests.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chat-app-server/src/test/kotlin/com/example/chat_app_server/ChatAppServerApplicationTests.kt" beforeDir="false" afterPath="$PROJECT_DIR$/chat-app-server/src/test/kotlin/com/example/chat_app_server/ChatAppServerApplicationTests.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_app_client/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/chat_app_client/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chat_app_client/src/main/kotlin/com/example/chat_app_client/ChatAppClientApplication.kt" beforeDir="false" afterPath="$PROJECT_DIR$/chat_app_client/src/main/kotlin/com/example/chat_app_client/ChatAppClientApplication.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +25,9 @@
       <ProjectState />
     </projectState>
     <projectState path="$PROJECT_DIR$/chat-app-server">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/chat_app_client">
       <ProjectState />
     </projectState>
   </component>
@@ -48,12 +45,7 @@
             <expand>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="chat-app-client" type="f1a62948:ProjectNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="chat-app-client" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="chat_app_client" type="f1a62948:ProjectNode" />
               </path>
             </expand>
             <select />
@@ -67,15 +59,15 @@
       <list>
         <option value="Kotlin Data Class" />
         <option value="Kotlin Interface" />
-        <option value="Kotlin Class" />
         <option value="Kotlin Object" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$/chat-app-client" gradleHome="C:\Users\ashis\.gradle\wrapper\dists\gradle-9.4.0-bin\lcvyxq3t37f6mx9miaydrrgs\gradle-9.4.0" javaHome="C:\Program Files\Java\jdk-17" gradleVersion="9.4.0" />
+  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$/chat_app_client" gradleHome="C:\Users\ashis\.gradle\wrapper\dists\gradle-9.4.0-bin\lcvyxq3t37f6mx9miaydrrgs\gradle-9.4.0" javaHome="C:\Program Files\Java\jdk-17" gradleVersion="9.4.0" />
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -121,7 +113,7 @@
 }</component>
   <component name="RunManager" selected="Spring Boot.ChatAppClientApplication">
     <configuration name="ChatAppClientApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="chat-app-client.main" />
+      <module name="chat_app_client.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.chat_app_client.ChatAppClientApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -151,7 +143,7 @@
       <option name="presentableId" value="Default" />
       <updated>1774423351691</updated>
       <workItem from="1774423355722" duration="22801000" />
-      <workItem from="1774457923735" duration="17000" />
+      <workItem from="1774457923735" duration="1971000" />
     </task>
     <servers />
   </component>

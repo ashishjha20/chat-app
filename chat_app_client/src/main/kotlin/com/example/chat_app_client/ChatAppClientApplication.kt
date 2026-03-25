@@ -7,5 +7,6 @@ import org.springframework.boot.runApplication
 class ChatAppClientApplication
 
 fun main(args: Array<String>) {
-	runApplication<ChatAppClientApplication>(*args)
+	val context = runApplication<ChatAppClientApplication>(*args)
+	context.getBean(ChatClientImpl::class.java).start()
 }
