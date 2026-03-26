@@ -22,6 +22,7 @@ class ChatServiceImpl(
         responseObserver: StreamObserver<SendMessageResponse>
     ) {
 
+        //creating request to entity
         val entity = MessageEntity(
             messageId = UUID.randomUUID(),
             roomId = request.roomId,
@@ -30,8 +31,10 @@ class ChatServiceImpl(
             timestamp = Instant.now()
         )
 
+        //save to db
         repository.save(entity)
 
+        //creating proto response from entity
         val msg = ChatMessage.newBuilder()
             .setMessageId(entity.messageId.toString())
             .setRoomId(entity.roomId)
@@ -39,10 +42,14 @@ class ChatServiceImpl(
             .setContent(entity.content)
             .build()
 
+
+        //creating response
         val response = SendMessageResponse.newBuilder()
             .setMessage(msg)
             .build()
 
+
+        //sending the response
         responseObserver.onNext(response)
         responseObserver.onCompleted()
     }
@@ -53,9 +60,12 @@ class ChatServiceImpl(
         responseObserver: StreamObserver<GetMessagesResponse>
     ) {
 
-        val messages = repository.findByRoomId(request.roomId)
+        //fetching all  entities for the room from db
+        val entities = repository.findByRoomId(request.roomId)
+        
 
-        val protoList = messages.map {
+        // converting entities to proto messages
+        val messages = entities.map {
             ChatMessage.newBuilder()
                 .setMessageId(it.messageId.toString())
                 .setRoomId(it.roomId)
@@ -64,10 +74,13 @@ class ChatServiceImpl(
                 .build()
         }
 
+        // creating response with list of messages
         val response = GetMessagesResponse.newBuilder()
-            .addAllMessages(protoList)
+            .addAllMessages(messages)
             .build()
 
+
+        // sending the response
         responseObserver.onNext(response)
         responseObserver.onCompleted()
     }
@@ -77,13 +90,26 @@ class ChatServiceImpl(
         responseObserver: StreamObserver<ChatEvent>
     ): StreamObserver<ChatEvent> {
 
+
+        // Create a channel for sending events to this client
         val channel = Channel<ChatEvent>()
         var userId = ""
         var roomId = ""
 
 
+        // Start a coroutine to send events from the channel to the client
+        //what is coroutine? Coroutine is a lightweight thread that can be suspended 
+        //and resumed without blocking the main thread. It allows us to write asynchronous code in a 
+        //sequential manner. In this case, we are using a separate thread to continuously 
+        //receive events from the channel and send them to the client without blocking the main
+        //thread which is handling incoming events from the client.
+
+
+        //using separate thread to send events to client to avoid blocking the main thread 
+        ///which is handling incoming events from client
         val senderThread = Thread {
             try {
+                // Continuously receive events from the channel and send to client
                 kotlinx.coroutines.runBlocking {
                     while (true) {
                         val event = channel.receive()
@@ -94,18 +120,23 @@ class ChatServiceImpl(
                 e.printStackTrace()
             }
         }
+
+
         senderThread.start()
 
+
+        
         return object : StreamObserver<ChatEvent> {
 
             override fun onNext(event: ChatEvent) {
 
+                //if event has new message, save to db and broadcast to room
                 if (event.hasNewMessage()) {
                     val msg = event.newMessage
                     userId = msg.senderId
                     roomId = msg.roomId
 
-                   
+                   //creating entity from message
                     val entity = MessageEntity(
                         messageId = UUID.randomUUID(),
                         roomId = msg.roomId,
@@ -113,9 +144,12 @@ class ChatServiceImpl(
                         content = msg.content,
                         timestamp = Instant.now()
                     )
+
+                    //saving message to db
                     repository.save(entity)
 
-             
+                    //join the user to the room in RoomManager and associate the channel 
+                    //with the user for broadcasting messages
                     RoomManager.join(roomId, userId, channel)
 
                     // Broadcast the message to everyone in the room
@@ -144,6 +178,7 @@ class ChatServiceImpl(
         request: RoomRequest,
         responseObserver: StreamObserver<Empty>
     ) {
+        RoomManager.join(request.roomId, request.userId, Channel())
         println("User ${request.userId} joined room ${request.roomId}")
 
         responseObserver.onNext(Empty.getDefaultInstance())

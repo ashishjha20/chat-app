@@ -1,21 +1,25 @@
-package com.example.chat_app_client
+package com.example.chat_app_client.service
 
 import com.example.chat.proto.ChatEvent
 import com.example.chat.proto.ChatMessage
 import com.example.chat.proto.ChatServiceGrpc
+import com.example.chat.proto.GetMessagesRequest
 import com.example.chat.proto.RoomRequest
 import com.google.protobuf.Empty
+import io.grpc.stub.StreamObserver
 import net.devh.boot.grpc.client.inject.GrpcClient
 import org.springframework.stereotype.Component
 import java.util.Scanner
 import java.util.concurrent.CountDownLatch
-import io.grpc.stub.StreamObserver
 
 @Component
 class ChatClientImpl {
 
     @GrpcClient("chatService")
     private lateinit var chatServiceStub: ChatServiceGrpc.ChatServiceStub
+
+    @GrpcClient("chatService")
+    private lateinit var blockingChatServiceStub: ChatServiceGrpc.ChatServiceBlockingStub
 
     fun start() {
         val scanner = Scanner(System.`in`)
@@ -55,7 +59,9 @@ class ChatClientImpl {
                         return
                     }
                     if (msg.senderId != userId) {
-                        println("\n📩 ${msg.senderId}: ${msg.content}")
+                        // Use \r to move to the beginning of the line and clear it
+                        print("\r" + " ".repeat(100) + "\r") 
+                        println("📩 ${msg.senderId}: ${msg.content}")
                         print("> ")
                     }
                 }
@@ -78,7 +84,7 @@ class ChatClientImpl {
         }
 
         println("\n✅ Joined room: $roomId")
-        println("Type messages (type 'exit' to quit)\n")
+        println("Type 'getMessages' to see history, or 'exit' to quit.\n")
 
         while (true) {
             print("> ")
@@ -86,6 +92,21 @@ class ChatClientImpl {
 
             if (text.equals("exit", ignoreCase = true)) {
                 break
+            }
+
+            if (text.equals("getMessages", ignoreCase = true)) {
+                try {
+                    val request = GetMessagesRequest.newBuilder().setRoomId(roomId).build()
+                    val response = blockingChatServiceStub.getMessages(request)
+                    println("\n--- Message History for room '$roomId' ---")
+                    response.messagesList.takeLast(15).forEach { msg ->
+                        println("[${msg.senderId}]: ${msg.content}")
+                    }
+                    println("--- End of History ---\n")
+                } catch (e: Exception) {
+                    println("Error fetching messages: ${e.message}")
+                }
+                continue
             }
 
             val event = ChatEvent.newBuilder()
