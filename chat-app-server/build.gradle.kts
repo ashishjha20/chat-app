@@ -44,6 +44,7 @@ dependencies {
 
 	implementation("org.postgresql:postgresql")
 	runtimeOnly("org.postgresql:postgresql")
+	implementation("org.springframework.security:spring-security-crypto")
 
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	runtimeOnly("com.h2database:h2")

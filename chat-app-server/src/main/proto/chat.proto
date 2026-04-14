@@ -3,28 +3,26 @@ syntax = "proto3";
 package chat;
 option java_package = "com.example.chat.proto";
 option java_multiple_files = true;
-option java_outer_classname="ChatAppProto";
-import "google/protobuf/timestamp.proto";
+option java_outer_classname = "ChatAppProto";
+
 import "google/protobuf/empty.proto";
-
-
+import "google/protobuf/timestamp.proto";
 
 service ChatService {
-
-  // Send message (Client → Server → DB)
-  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
-
-  // Get old messages from db
-  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
-
-  // Join room (bi-directional streaming)
-  rpc ChatStream(stream ChatEvent) returns (stream ChatEvent);
-
-  //Join and Leave room
-  rpc JoinRoom(RoomRequest) returns (google.protobuf.Empty);
+  rpc Register(RegisterRequest) returns (AuthResponse);
+  rpc Login(LoginRequest) returns (AuthResponse);
+  rpc ListMyRooms(UserRequest) returns (ListRoomsResponse);
+  rpc ListAvailableRooms(UserRequest) returns (ListRoomsResponse);
+  rpc CreateRoom(CreateRoomRequest) returns (RoomResponse);
+  rpc JoinRoom(RoomRequest) returns (RoomResponse);
   rpc LeaveRoom(RoomRequest) returns (google.protobuf.Empty);
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
+  rpc ChatStream(stream ChatEvent) returns (stream ChatEvent);
+  rpc SendPrivateInvite(PrivateInviteRequest) returns (PrivateInviteResponse);
+  rpc ListPendingInvites(UserRequest) returns (ListPendingInvitesResponse);
+  rpc RespondToPrivateInvite(RespondToPrivateInviteRequest) returns (PrivateInviteResponse);
 }
-
 
 enum MessageStatus {
   UNKNOWN = 0;
@@ -33,22 +31,73 @@ enum MessageStatus {
   READ = 3;
 }
 
+enum RoomType {
+  ROOM_TYPE_UNSPECIFIED = 0;
+  PUBLIC = 1;
+  PRIVATE_DIRECT = 2;
+}
 
-
-message User {
-  string user_id = 1;
-  string username = 2;
+enum InviteStatus {
+  INVITE_STATUS_UNSPECIFIED = 0;
+  PENDING = 1;
+  ACCEPTED = 2;
+  DECLINED = 3;
 }
 
 message ChatMessage {
   string message_id = 1;
   string room_id = 2;
-
   string sender_id = 3;
   string content = 4;
-
   google.protobuf.Timestamp timestamp = 5;
   MessageStatus status = 6;
+}
+
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+  bool success = 1;
+  string username = 2;
+  string message = 3;
+}
+
+message UserRequest {
+  string username = 1;
+}
+
+message RoomSummary {
+  string room_id = 1;
+  string room_name = 2;
+  RoomType room_type = 3;
+  int32 unread_count = 4;
+  google.protobuf.Timestamp last_seen_at = 5;
+}
+
+message ListRoomsResponse {
+  repeated RoomSummary rooms = 1;
+}
+
+message CreateRoomRequest {
+  string username = 1;
+  string room_name = 2;
+}
+
+message RoomRequest {
+  string user_id = 1;
+  string room_id = 2;
+}
+
+message RoomResponse {
+  RoomSummary room = 1;
+  string message = 2;
 }
 
 message SendMessageRequest {
@@ -62,21 +111,45 @@ message SendMessageResponse {
 }
 
 message GetMessagesRequest {
-  string room_id = 1;
-
-  int32 page_size = 2;
-  string last_message_id = 3;
+  string username = 1;
+  string room_id = 2;
+  int32 limit = 3;
+  bool unread_only = 4;
 }
 
 message GetMessagesResponse {
   repeated ChatMessage messages = 1;
 }
 
-message RoomRequest {
-  string user_id = 1;
-  string room_id = 2;
+message PrivateInviteRequest {
+  string from_user = 1;
+  string to_user = 2;
 }
 
+message InviteSummary {
+  string invite_id = 1;
+  string from_user = 2;
+  string to_user = 3;
+  InviteStatus status = 4;
+  string room_id = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message PrivateInviteResponse {
+  InviteSummary invite = 1;
+  RoomSummary room = 2;
+  string message = 3;
+}
+
+message ListPendingInvitesResponse {
+  repeated InviteSummary invites = 1;
+}
+
+message RespondToPrivateInviteRequest {
+  string invite_id = 1;
+  string username = 2;
+  bool accept = 3;
+}
 
 message AckRequest {
   string message_id = 1;
@@ -84,15 +157,15 @@ message AckRequest {
   MessageStatus status = 3;
 }
 
-
+message InviteNotification {
+  InviteSummary invite = 1;
+  string message = 2;
+}
 
 message ChatEvent {
   oneof event {
     ChatMessage new_message = 1;
     AckRequest ack = 2;
+    InviteNotification invite_notification = 3;
   }
 }
-
-
-
-
